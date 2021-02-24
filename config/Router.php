@@ -43,13 +43,20 @@ class Router{
         };
         $formatedRoute = $this->grabEndpointName($this->request->REQUEST_URI);
 
-        $Method = $methodDictionary[$formatedRoute];
-
+        
+        if(empty($methodDictionary[$formatedRoute]))
+            {
+                header("404 not found");
+                return;
+            }
+        else
+            $Method = $methodDictionary[$formatedRoute];
+    /*
         if(is_null($Method)){
             header("404 not found");
             return;
         }
-
+    */
         //admin call to fetch uri endpoint
         echo call_user_func_array($Method, array($this->request));
     }

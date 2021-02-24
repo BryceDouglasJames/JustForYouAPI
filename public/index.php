@@ -11,6 +11,8 @@
 
     $RequestListener = new Requests();
     $router = new Router($RequestListener);
+    $Database = new Database();
+    $Database->establishConn();
 
     $router->get('/', function() {
         return <<<HTML
@@ -34,6 +36,22 @@
 
         return $data['pass'];
     });
+   
+    // does not currently invoke the insertData() function
+    $router->post('/register', function($request){
+        $Database->insertData("one","two","three"); //test values
+        
+        //$data = $request->getPayloadData();
+        // $Database->insertData($data['name'],$data['email'], $data['pass']);
+    });
+
+    // does not currently invoke the getAllData() function
+    $router->get('/returnUsers', function($request) {
+        $printout = $Database->getAllData();
+    
+        return $printout;
+    });
+
 
     /*
     switch ($method) {
@@ -49,4 +67,6 @@
             break;
     }
 
-    $con->close();*/
+    $con->close();
+    */
+    ?>
