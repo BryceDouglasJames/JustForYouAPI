@@ -43,20 +43,13 @@ class Router{
         };
         $formatedRoute = $this->grabEndpointName($this->request->REQUEST_URI);
 
-        
-        if(empty($methodDictionary[$formatedRoute]))
-            {
-                header("404 not found");
-                return;
-            }
-        else
-            $Method = $methodDictionary[$formatedRoute];
-    /*
+        $Method = $methodDictionary[$formatedRoute];
+
         if(is_null($Method)){
             header("404 not found");
             return;
         }
-    */
+
         //admin call to fetch uri endpoint
         echo call_user_func_array($Method, array($this->request));
     }
@@ -65,7 +58,9 @@ class Router{
     public function grabEndpointName($string){
 
         $ReturnPoint = "";
-        $ReturnPoint = str_replace("/JustForYouAPI/public", null, $string);
+
+        //THIS STRING IS VERY IMPORTANT PLEASE MAKE SURE YOU ADD YOUR DIRECTORY
+        $ReturnPoint = str_replace("/justforyouapi/public", null, $string);
 
         if (strpos($ReturnPoint, '/index.php') !== false) {
             $ReturnPoint = str_replace("/index.php", null, $ReturnPoint);
@@ -74,7 +69,7 @@ class Router{
         return $ReturnPoint;
 
     }
-    
+
     private function formatMethodType($string){
         return $string;
     }

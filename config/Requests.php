@@ -19,8 +19,6 @@
             }
         }
 
-       
-
         //interface method
         public function getPayloadData(){
             if($this->REQUEST_METHOD === "GET"){
@@ -36,7 +34,6 @@
                 header("Method error");
             }
         }
-
 
         private function formatServerAttribute($string){
             return $string;
