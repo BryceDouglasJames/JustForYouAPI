@@ -1,23 +1,20 @@
 <?php
-    header("Access-Control-Allow-Origin: *");
-    header("Access-Control-Allow-Headers: access");
+    header("Access-Control-Allow-Origin: *");    
+    header("Access-Control-Allow-Headers: Content-Type, origin");  
 
     include_once '../config/Requests.php';
     include_once '../config/Router.php';
     include_once '../config/Database.php';
+    include_once '../src/Controllers/UserController.php';
 
-    $RequestListener = new Requests();
-    $router = new Router($RequestListener);
     
-   
+    $RequestListener = new Requests();
+    $router = new Router($RequestListener);   
+    $DBInstance = new Database();
+    $con = $DBInstance->establishConn();
 
     $router->get('/', function() {
        return("HELLO WORLD :)");
-    });
-
-
-    $router->get('/profile', function($request) {
-        
     });
 
     $router->post('/data', function($request) {
@@ -25,37 +22,45 @@
         return json_encode($data["username"]);
     });
 
-    $router->post('/users/grab/all', function($request){
+    $router->post('/users/grab/all', function($request) use ($con, $DBInstance){
         $data = $request->getPayloadData();
-        $DBInstance = new Database();
-        $con = $DBInstance->establishConn();
+
+        //pass connection to user model to take care of call
+        $UserCall = new UserController($con);
+        $UserCall -> setCurrentTable('usertable');
+        return $UserCall->getAllUsers();
         
-        if($DBInstance->pingServer($con)){
-            $result = $DBInstance->getAllUserData($con);
-            
-        }
-
-        $con->close();
-        return json_encode($result);
     });
 
-    $router->post('/login', function($request){
-        return ("<h1>LOGIN<h1>");
+    $router->post('/users/grab/delete', function($request) use ($con, $DBInstance){
+        $data = $request->getPayloadData();
+
+        
+        //pass connection to user model to take care of call
+        $UserCall = new UserController($con);
+
+        //delete user and return confirmation
+        $UserCall -> setCurrentTable('usertable');
+        $UserCall->delete($data["DeleteUserWithID"]);
+        return $UserCall->getAllUsers();
+
     });
+
+    $router->post('/users/add', function($request) use ($con, $DBInstance){
+        $data = $request->getPayloadData();
+
+        $user = $data['username'];
+        $email = $data['email'];
+        $pass = $data['password'];
+
+        //pass connection to user model to take care of call
+        $UserCall = new UserController($con);
+        $UserCall -> setCurrentTable('usertable');
+        $UserCall -> addUser($user, $email, $pass);
+        return $UserCall->getAllUsers();
+
+    });
+
+
    
-    // does not currently invoke the insertData() function
-    $router->post('/register', function($request){
-        $Database->insertData("one","two","three"); //test values
-        
-        //$data = $request->getPayloadData();
-        // $Database->insertData($data['name'],$data['email'], $data['pass']);
-    });
-
-    // does not currently invoke the getAllData() function
-    $router->get('/returnUsers', function($request) {
-        $printout = $Database->getAllData();
-    
-        return $printout;
-    });
-
 ?>
