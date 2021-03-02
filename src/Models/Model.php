@@ -82,6 +82,7 @@
            
         }
 
+
         public static function deleteById($id){
             $sql = 'DELETE FROM ' . self::getTable() . ' WHERE user_id= ' . $id;
             $entries = self::query($sql);
@@ -92,6 +93,13 @@
             $entries = self::getByField('id', $id);
             if ($entries == null) return null;
             return $entries[0];
+        }
+
+
+        public function getByUsername($username){
+            $sql = "SELECT * FROM " . self::getTable() . " WHERE user = " . $username;
+            $result = $self::query($sql);
+            return ($result);
         }
 
         public static function getByField($field, $value){
@@ -137,7 +145,6 @@
 
 
         private function query($sql){
-            echo($sql);
             $result = self::$conn -> query($sql);
             return $result;
         }

@@ -21,7 +21,7 @@ class User extends Model
         return self::getByField("username", $username);
     }
 
-    public function verifyPasswordFromhash($password){
+    public function verifyPassword($password){
         return password_verify($password, $this->password_hash);
     }
 

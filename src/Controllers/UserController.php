@@ -6,8 +6,7 @@ class UserController
 {
     protected $db;
 
-    public function __construct($con)
-    {
+    public function __construct($con){
         User::useConnection($con);
     }
 
@@ -32,9 +31,20 @@ class UserController
        
     }
 
-    public function authenticate(){
-        
+    public function createUser($payload){
+
     }
+
+    //must configure model/user relation properly
+    /*public function authenticate($payload){
+
+        $user = User::getByUsername($payload['username']);
+        $verify = User::verifyPassword($payload['password']);
+        if(!$verify){
+            throw new HttpForbiddenException($payload, "Invalid username or password.");
+        }
+        return json_encode($user);
+    }*/
 
     public function delete($id){
         $response = User::deleteById($id);
@@ -42,6 +52,7 @@ class UserController
     }
 
     public function create(){
+
     }
 
     public function setCurrentTable($thisTable){

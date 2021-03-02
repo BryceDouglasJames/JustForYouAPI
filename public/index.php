@@ -22,6 +22,12 @@
         return json_encode($data["username"]);
     });
 
+    /*$router -> post("/users/auth", function($request) use ($con, $DBInstance){
+        $UserCall = new UserController($con);
+        $UserCall -> setCurrentTable('usertable');
+        return $UserCall -> authenticate($request->getPayloadData());
+    });*/
+
     $router->post('/users/grab/all', function($request) use ($con, $DBInstance){
         $data = $request->getPayloadData();
 
