@@ -7,6 +7,7 @@ class User extends Model
     public $username;
     public $password_hash;
     public $user_role;
+    public $id;
 
     protected $private_fields = ["password_hash"];
 
@@ -24,5 +25,5 @@ class User extends Model
     public function verifyPassword($password){
         return password_verify($password, $this->password_hash);
     }
-
+    
 }

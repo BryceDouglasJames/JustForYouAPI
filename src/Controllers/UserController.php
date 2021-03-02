@@ -27,8 +27,9 @@ class UserController
         
     }
 
-    public function getCurrent(){
-       
+    public function getCurrent($payload){
+        $user = User::getByUsername($payload['username']);
+        return $user;
     }
 
     public function createUser($payload){
@@ -36,7 +37,7 @@ class UserController
     }
 
     //must configure model/user relation properly
-    /*public function authenticate($payload){
+    public function authenticate($payload){
 
         $user = User::getByUsername($payload['username']);
         $verify = User::verifyPassword($payload['password']);
@@ -44,7 +45,7 @@ class UserController
             throw new HttpForbiddenException($payload, "Invalid username or password.");
         }
         return json_encode($user);
-    }*/
+    }
 
     public function delete($id){
         $response = User::deleteById($id);

@@ -6,12 +6,13 @@
     include_once '../config/Router.php';
     include_once '../config/Database.php';
     include_once '../src/Controllers/UserController.php';
-
+    include_once '../conSession.php';
     
     $RequestListener = new Requests();
     $router = new Router($RequestListener);   
     $DBInstance = new Database();
     $con = $DBInstance->establishConn();
+    $session = new Session();
 
     $router->get('/', function() {
        return("HELLO WORLD :)");
@@ -22,11 +23,12 @@
         return json_encode($data["username"]);
     });
 
-    /*$router -> post("/users/auth", function($request) use ($con, $DBInstance){
+    $router -> post("/users/auth", function($request) use ($con, $DBInstance){
         $UserCall = new UserController($con);
         $UserCall -> setCurrentTable('usertable');
+        $session->login($UserCall->getCurrent($request->getPayloadData()));
         return $UserCall -> authenticate($request->getPayloadData());
-    });*/
+    });
 
     $router->post('/users/grab/all', function($request) use ($con, $DBInstance){
         $data = $request->getPayloadData();
