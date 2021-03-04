@@ -1,7 +1,7 @@
 <?php
 
-require_once "../src/models/Model.php";
-require_once "../src/models/User.php";
+include_once  __DIR__ . ("/../src/Models/Model.php");
+include_once  __DIR__ . ("/../src/Models/User.php");
 
 class Session
 {

@@ -6,7 +6,7 @@
     include_once '../config/Router.php';
     include_once '../config/Database.php';
     include_once '../src/Controllers/UserController.php';
-    include_once '../conSession.php';
+    include_once '../config/session.php';
     
     $RequestListener = new Requests();
     $router = new Router($RequestListener);   
@@ -23,11 +23,24 @@
         return json_encode($data["username"]);
     });
 
-    $router -> post("/users/auth", function($request) use ($con, $DBInstance){
+    $router->post("/users/create", function($request) use ($con, $DBInstance){
+        $data = $request->getPayloadData();
         $UserCall = new UserController($con);
         $UserCall -> setCurrentTable('usertable');
-        $session->login($UserCall->getCurrent($request->getPayloadData()));
-        return $UserCall -> authenticate($request->getPayloadData());
+        $answer = $UserCall -> addUser($data);
+        return json_encode($answer);
+    });
+
+    $router -> post("/users/auth", function($request) use ($con, $DBInstance, $session){
+        $data = $request->getPayloadData();
+        $UserCall = new UserController($con);
+        $UserCall -> setCurrentTable('usertable');
+
+        //$RequestUser = $UserCall->getCurrent($data);
+        //$session->login($RequestUser);
+
+        $answer = $UserCall -> authenticate($data);
+        return json_encode($answer);
     });
 
     $router->post('/users/grab/all', function($request) use ($con, $DBInstance){
@@ -53,22 +66,6 @@
         return $UserCall->getAllUsers();
 
     });
-
-    $router->post('/users/add', function($request) use ($con, $DBInstance){
-        $data = $request->getPayloadData();
-
-        $user = $data['username'];
-        $email = $data['email'];
-        $pass = $data['password'];
-
-        //pass connection to user model to take care of call
-        $UserCall = new UserController($con);
-        $UserCall -> setCurrentTable('usertable');
-        $UserCall -> addUser($user, $email, $pass);
-        return $UserCall->getAllUsers();
-
-    });
-
 
    
 ?>

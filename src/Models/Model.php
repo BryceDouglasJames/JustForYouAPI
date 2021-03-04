@@ -96,10 +96,21 @@
         }
 
 
-        public function getByUsername($username){
-            $sql = "SELECT * FROM " . self::getTable() . " WHERE user = " . $username;
-            $result = $self::query($sql);
-            return ($result);
+        public static function getByUsername($username){
+            $sql = "SELECT * FROM " . self::getTable() . " WHERE name = '" . $username . "'";
+            $result = self::query($sql);
+            if(!$result || $result->fetch_row() === null){
+                return false;
+            }else{
+                $row = $result->fetch_row();
+                $buffer = array(
+                    'UID' => $row[0],
+                    'Name' => $row[1],
+                    'Email' => $row[2],
+                    'Pass' => $row[3]
+                );      
+                return $buffer;
+            }
         }
 
         public static function getByField($field, $value){

@@ -16,44 +16,52 @@ class UserController
     }
 
 
-    public function addUser($name, $email, $pass){
+    public function addUser($payload){
+        if ($payload['username'] === "") {
+            throw new Error("Username cannot be empty");
+        }
+        if ($payload['email'] === "") {
+            throw new Error("Email cannot be empty");
+        }
+        if ($payload['password'] === "") {
+            throw new Error("Password cannot be empty");
+        }
         $cols = array("name", "email", "pass");
-        $vals = array($name, $email, $pass);
+        $vals = array($payload['username'], $payload['email'], $payload['password']);
         $response = User::insert($cols, $vals);
-        return json_encode($response);
+
+        return true;
+        /*if(!$response){
+            throw new Error("Trouble adding user to table");
+            return false;
+        }else{
+            return true;
+        }*/
     }
 
-    public function getById($ID){
-        
-    }
 
     public function getCurrent($payload){
         $user = User::getByUsername($payload['username']);
-        return $user;
-    }
-
-    public function createUser($payload){
-
-    }
-
-    //must configure model/user relation properly
-    public function authenticate($payload){
-
-        $user = User::getByUsername($payload['username']);
-        $verify = User::verifyPassword($payload['password']);
-        if(!$verify){
-            throw new HttpForbiddenException($payload, "Invalid username or password.");
+        if(!$thisUser){ 
+            throw new Error("Trouble finding user");
+        }else{
+            return $thisUser;
         }
-        return json_encode($user);
+        return $thisUser;
+    }
+
+
+    public function authenticate($payload){
+        $user = User::getByUsername($payload['username']);
+        if(!$user) {return false;}
+        $verify = User::verifyPassword($payload['password']);
+        if(!$verify) {return false;}            
+        return true;
     }
 
     public function delete($id){
         $response = User::deleteById($id);
         return json_encode($response);
-    }
-
-    public function create(){
-
     }
 
     public function setCurrentTable($thisTable){
