@@ -10,12 +10,14 @@ class UserController
         User::useConnection($con);
     }
 
+    //ADMIN FUNCTION return all users at a limit of 25
     public function getAllUsers(){
         $response = User::getAllUserData();
         return json_encode($response);
     }
 
 
+    //checks request payload that contains user signup info and stores if okay
     public function addUser($payload){
         if ($payload['username'] === "" || $payload['username'] === "undefined") {
             //throw new Error("Username cannot be empty");
@@ -44,6 +46,7 @@ class UserController
     }
 
 
+    //returns current user
     public function getCurrent($payload){
         $user = User::getByUsername($payload['username']);
         if(!$thisUser){ 
@@ -55,6 +58,7 @@ class UserController
     }
 
 
+    //ROUGH AUTHENTICATION> NEEDS TO BE MANAGED
     public function authenticate($payload){
         $user = User::getByUsername($payload['username']);
         if(!$user) {return false;}
@@ -63,11 +67,13 @@ class UserController
         return true;
     }
 
+    //Delete user by id
     public function delete($id){
         $response = User::deleteById($id);
         return json_encode($response);
     }
 
+    //sets instance table
     public function setCurrentTable($thisTable){
         User::setTable($thisTable);
     }

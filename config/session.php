@@ -15,11 +15,13 @@ class Session
 		$this-check_login();
 	}
 
+	//Simple getter for login status
 	public function is_logged_in()
 	{
 		return $this->logged_in;
 	}
 
+	//Upon Login, Associate user sessions
 	public function login($user)
 	{
 		if($user)
@@ -30,6 +32,7 @@ class Session
 		}
 	}
 
+	//instead of destroying session, unset session variables
 	public function logout()
 	{
 		unset($_SESSION['user_id']);
@@ -39,6 +42,7 @@ class Session
 		$this->logged_in = false;
 	}
 
+	//verify user login
 	private function check_login()
 	{
 		if(isset($_SESSION['user_id']))

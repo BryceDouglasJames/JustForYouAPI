@@ -15,17 +15,6 @@
             settype($this->id, 'integer');
         }
 
-        public function useConnection($conn){
-            self::$conn = $conn;
-        }
-
-        public function setTable($thisTable){
-            self::$table = $thisTable;
-        }
-
-        private function getTable(){
-            return self::$table;
-        }
 
         //query all the users, return array of JSON objects
         public function getAllUserData(){
@@ -83,12 +72,14 @@
         }
 
 
+        //Grab user ID and delte it accordingly
         public static function deleteById($id){
             $sql = 'DELETE FROM ' . self::getTable() . ' WHERE user_id= ' . $id;
             $entries = self::query($sql);
             return $entries;
         }
 
+        //return user by ID
         public static function getById($id){
             $entries = self::getByField('id', $id);
             if ($entries == null) return null;
@@ -96,6 +87,7 @@
         }
 
 
+        //Grab by username and send back an array of selected user props
         public static function getByUsername($username){
             $sql = "SELECT * FROM " . self::getTable() . " WHERE name = '" . $username . "'";
             $result = self::query($sql);
@@ -113,12 +105,16 @@
             }
         }
 
+        
+        //sends query based off of specified columns
         public static function getByField($field, $value){
             $sql = 'SELECT * FROM ' . self::getTable() . ' WHERE ' . $field . '='. $value;
             $entries = self::query($sql);
             return $entries;
         }
+        
 
+        /*//SAVE FOR FUTURE WHEN WE ARE HASHING PASSWORDS AND RESPONSES
         public static function getPrivateFields($arr){
             $obj = new static();
             foreach ($arr as $field => $value) {
@@ -141,7 +137,7 @@
                 array_keys(get_public_vars($this)),
                 ["id", "created_at", "updated_at", "deleted_at"]
             );
-        }
+        }*/
 
         //checks to make sure Database is alive
         public function pingServer($thisCon){
@@ -155,13 +151,27 @@
         }
 
 
+        //sends simple query across
         private function query($sql){
             $result = self::$conn -> query($sql);
             return $result;
         }
+
+        //GETTERS/SETTERS
+        public function useConnection($conn){
+            self::$conn = $conn;
+        }
+    
+        public function setTable($thisTable){
+            self::$table = $thisTable;
+        }
+
+        private function getTable(){
+            return self::$table;
+        }
     }
 
-    //
+    //refernce private variables outside of scope
     function get_public_vars($instance)
     {
         return get_object_vars($instance);
