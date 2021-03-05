@@ -17,20 +17,24 @@ class UserController
 
 
     public function addUser($payload){
-        if ($payload['username'] === "") {
-            throw new Error("Username cannot be empty");
+        if ($payload['username'] === "" || $payload['username'] === "undefined") {
+            //throw new Error("Username cannot be empty");
+            return false;
         }
-        if ($payload['email'] === "") {
-            throw new Error("Email cannot be empty");
+        else if ($payload['email'] === "" || $payload['email'] === "undefined") {
+            //throw new Error("Email cannot be empty");
+            return false;
         }
-        if ($payload['password'] === "") {
-            throw new Error("Password cannot be empty");
-        }
-        $cols = array("name", "email", "pass");
-        $vals = array($payload['username'], $payload['email'], $payload['password']);
-        $response = User::insert($cols, $vals);
+        else if ($payload['password'] === "" || $payload['password'] === "undefined") {
+            //throw new Error("Password cannot be empty");
+            return false;
+        }else{
+            $cols = array("name", "email", "pass");
+            $vals = array($payload['username'], $payload['email'], $payload['password']);
+            $response = User::insert($cols, $vals);
 
-        return true;
+            return true;
+        }
         /*if(!$response){
             throw new Error("Trouble adding user to table");
             return false;
