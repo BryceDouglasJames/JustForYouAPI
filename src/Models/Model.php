@@ -89,19 +89,23 @@
 
         //Grab by username and send back an array of selected user props
         public static function getByUsername($username){
+            $answer = array();
             $sql = "SELECT * FROM " . self::getTable() . " WHERE name = '" . $username . "'";
             $result = self::query($sql);
-            if(!$result || $result->fetch_row() === null){
+            if(!$result){
                 return false;
             }else{
-                $row = $result->fetch_row();
-                $buffer = array(
-                    'UID' => $row[0],
-                    'Name' => $row[1],
-                    'Email' => $row[2],
-                    'Pass' => $row[3]
-                );      
-                return $buffer;
+                while($row = $result->fetch_row()){
+                    $buffer = array(
+                        'UID' => $row[0],
+                        'Name' => $row[1],
+                        'Email' => $row[2],
+                        'Pass' => $row[3]
+                    ); 
+                    array_push($answer, $buffer);    
+                }
+                print_r($answer);
+                return $answer;
             }
         }
 
