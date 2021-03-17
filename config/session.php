@@ -8,15 +8,17 @@ class Session
 	private $logged_in = false;
 	public $user_id;
 	public $userName;
-
+	public $user_role;
+	
+	//creates a session when an instance of this class is created
 	function _construct()
 	{
 		session_start();
-		$this-check_login();
+		$this->verify_login();
 	}
 
 	//Simple getter for login status
-	public function is_logged_in()
+	public function check_login()
 	{
 		return $this->logged_in;
 	}
@@ -28,6 +30,7 @@ class Session
 		{
 			$this->user_id = $_SESSION['user_id'] = $user->id;
 			$this->userName = $_SESSION['user_name'] = $user->username;
+			$this->user_role = $_SESSION['role'] = $user->user_role;
 			$this->logged_in = true;
 		}
 	}
@@ -35,15 +38,12 @@ class Session
 	//instead of destroying session, unset session variables
 	public function logout()
 	{
-		unset($_SESSION['user_id']);
-		unset($this->user_id);
-		unset($_SESSION['user_name']);
-		unset($this->userName);
+		session_unset();
 		$this->logged_in = false;
 	}
 
 	//verify user login
-	private function check_login()
+	private function verify_login()
 	{
 		if(isset($_SESSION['user_id']))
 		{
@@ -55,6 +55,18 @@ class Session
 			unset($this->user_id);
 			$this->logged_in = false;
 		}
+	}
+
+
+	//getter for session ID: returns current session ID
+	public function get_SID()
+	{
+		verify_login();
+		if(logged_in)
+			return session_id();
+		else
+			return "";
+
 	}
 }
 
