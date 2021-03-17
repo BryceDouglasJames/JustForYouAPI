@@ -31,7 +31,7 @@ class UserController
             //throw new Error("Password cannot be empty");
             return false;
         }else{
-            $cols = array("name", "email", "pass");
+            $cols = array("name", "email", "password");
             $vals = array($payload['username'], $payload['email'], $payload['password']);
             $response = User::insert($cols, $vals);
 

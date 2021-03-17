@@ -60,6 +60,7 @@
 
             //send query, throw error if query isn't formatted properly.
             $result = self::query("INSERT INTO " . self::getTable() . " (" . $colString . ") VALUES (" . $valueString . ")");
+            
             if(!$result){
                 throw new Exception("Error inserting into table.");
             }
@@ -104,7 +105,6 @@
                     ); 
                     array_push($answer, $buffer);    
                 }
-                print_r($answer);
                 return $answer;
             }
         }

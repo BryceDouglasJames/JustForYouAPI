@@ -1,19 +1,11 @@
 <?php
 
-    //FOR DEVELOPMENT
-    /*
-        TEST DATABASE NAME: test
-    /*
-        INSERT TEST TABLE QUERY::
-        CREATE TABLE `usertable`( `user_id` INT NOT NULL AUTO_INCREMENT,`name` varchar(100) NOT NULL, `email` varchar(100) NOT NULL, `pass` varchar(100) NOT NULL, PRIMARY KEY(user_id));
-    */
-
     header("Access-Control-Allow-Origin: *");
     header("Access-Control-Allow-Headers: access"); 
     define('DB_SERVER', 'localhost');
     define('DB_USERNAME', 'root');
     define('DB_PASSWORD', '');
-    define('DB_NAME', 'test');
+    define('DB_NAME', 'jfy_db');
 
     class Database{
 
