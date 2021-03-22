@@ -117,6 +117,31 @@
             return $entries;
         }
         
+        public static function getAllQuestions(){
+            $sql = 'SELECT * FROM questions LIMIT 0,100';
+            $questions = self::query($sql);
+            if(!$questions){
+                throw new Error("Cannot get questions.");
+            }else{
+                return $questions;
+            }
+        }
+
+        public static function getAllAnswers(){
+
+        }
+
+        public static function getAnswerByID($id){
+            $sql = 'SELECT * FROM responses WHERE QUID = 1';
+
+            $answer = self::query($sql);
+            if(!$answer){
+                throw new Error("Cannot get answers from provided ID.");
+            }else{
+                return $answer;
+            }
+        }
+
 
         /*//SAVE FOR FUTURE WHEN WE ARE HASHING PASSWORDS AND RESPONSES
         public static function getPrivateFields($arr){

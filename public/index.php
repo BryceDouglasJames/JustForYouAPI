@@ -1,15 +1,20 @@
 <?php
+
+    /*********RESPONSE HEADER CONFIG*********/
     header("Access-Control-Allow-Origin: *");    
     header("Access-Control-Allow-Headers: Content-Type, origin");  
 
+    /*********CONFIG RESOURCES*********/
     include_once '../config/Requests.php';
     include_once '../config/Router.php';
     include_once '../config/Database.php';
-    include_once '../src/Controllers/UserController.php';
     include_once '../config/session.php';
-    
 
-    //SET OBJECT FOR REQUEST INSTANCE
+    /*********MODEL CONTROLLERS*********/
+    include_once '../src/Controllers/UserController.php';
+    include_once '../src/Controllers/QuestionController.php';
+
+
     $RequestListener = new Requests();
     $router = new Router($RequestListener);   
     $DBInstance = new Database();
@@ -51,8 +56,17 @@
         return json_encode($answer);
     });
 
+    $router -> get("/grab/question", function($request) use ($con, $DBInstance, $session){
+        $controller = new QuestionController($con);
+        $question = $controller -> getRandomQuestion();
+
+        //clean up slashes in pre-processing?? Annyoing...
+        $question = json_encode($question, JSON_ESCAPED_SLASHES);
+        return $question;
+    });
+
     //FOR ADMIN::::Grabs all users at a rate of 25 by default and sends them back
-    $router->post('/users/grab/all', function($request) use ($con, $DBInstance){
+    $router->post('users/grab/all', function($request) use ($con, $DBInstance){
         $data = $request->getPayloadData();
 
         //pass connection to user model to take care of call
