@@ -56,20 +56,25 @@
         return json_encode($answer);
     });
 
+    //grab random question/answers and return it to client
     $router -> get("/grab/question", function($request) use ($con, $DBInstance, $session){
         $controller = new QuestionController($con);
         $question = $controller -> getRandomQuestion();
-
-        //clean up slashes in pre-processing?? Annyoing...
-        $question = json_encode($question, JSON_ESCAPED_SLASHES);
+        $question = json_encode($question);
         return $question;
+    });
+
+
+    $router->post('/users/settings/basicinfo', function($request) use ($con, $DBInstance){
+        $data = $request->getPayloadData();
+        $UserCall = new UserController($con);
+        $UserCall -> setCurrentTable('userprovider');
+        return json_encode($UserCall -> createNewUserInfo($data));
     });
 
     //FOR ADMIN::::Grabs all users at a rate of 25 by default and sends them back
     $router->post('users/grab/all', function($request) use ($con, $DBInstance){
         $data = $request->getPayloadData();
-
-        //pass connection to user model to take care of call
         $UserCall = new UserController($con);
         $UserCall -> setCurrentTable('usertable');
         return $UserCall->getAllUsers();

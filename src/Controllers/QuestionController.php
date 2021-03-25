@@ -1,8 +1,6 @@
 <?php
 
     include_once __DIR__ .'/../Models/Question.php';
-    include_once __DIR__ .'/../Models/Question.php';
-
 
 
     class QuestionController{
@@ -41,7 +39,7 @@
             $val = array();
             $answers = Question::getAnswerByID($Question_ID);
             while($row = $answers->fetch_row()){
-                $temp = stripslashes($row[2]);
+                $temp = stripslashes($row[3]);
                 $buffer = array(
                     'Answers' => $temp
                 ); 

@@ -59,12 +59,48 @@
             }
 
             //send query, throw error if query isn't formatted properly.
-            $result = self::query("INSERT INTO " . self::getTable() . " (" . $colString . ") VALUES (" . $valueString . ")");
-            
+            $sql = "INSERT INTO " . self::getTable() . " (" . $colString . ") VALUES (" . $valueString . ")";
+            $result = self::query($sql);
+            echo($sql);
             if(!$result){
                 throw new Exception("Error inserting into table.");
             }
 
+        }
+
+        public function update($cols, $values, $updateID){
+            $PRIMARY_KEY_MAP = array("usertable" => "UID", "userprovider" => "PROVID");
+
+            $updateString = "";
+
+            for($i = 0; $i < count($cols); $i++){
+                if($i === count($values) - 1){
+                    $updateString = $updateString . $cols[$i] . "=" . $values[$i];
+                }else{
+                    $updateString = $updateString . $cols[$i] . "=" . $values[$i] . ", ";
+                }
+            }
+
+            $sql = "UPDATE  " . self::getTable() . " SET " . $updateString . " where " . self::getTable() . "." . $PRIMARY_KEY_MAP[self::getTable()] . "=" . $updateID . ""; 
+            $result = self::query($sql);
+            echo($sql);
+            if(!$result){
+                throw new Exception("Error updating value in table");
+            }
+        }
+
+        public function getID($username){
+            $id = 0;
+            $sql = "SELECT UID FROM usertable WHERE name = '" . $username . "'";
+            $result = self::query($sql);
+            if(!$result){
+                return false;
+            }else{
+                while($row = $result -> fetch_row()){
+                    $id = $row[0];
+                }
+            }
+            return $id;
         }
 
         //update record by selected ID with field values
@@ -101,7 +137,8 @@
                         'UID' => $row[0],
                         'Name' => $row[1],
                         'Email' => $row[2],
-                        'Pass' => $row[3]
+                        'Pass' => $row[3],
+                        'NewUser' => $row[4]
                     ); 
                     array_push($answer, $buffer);    
                 }
@@ -117,6 +154,10 @@
             return $entries;
         }
         
+        public static function createUserInfo($field){
+            
+        }
+
         public static function getAllQuestions(){
             $sql = 'SELECT * FROM questions LIMIT 0,100';
             $questions = self::query($sql);

@@ -31,20 +31,36 @@ class UserController
             //throw new Error("Password cannot be empty");
             return false;
         }else{
-            $cols = array("name", "email", "password");
-            $vals = array($payload['username'], $payload['email'], $payload['password']);
+            $cols = array("name", "email", "password", "newuser");
+            $vals = array($payload['username'], $payload['email'], $payload['password'], true);
             $response = User::insert($cols, $vals);
 
             return true;
         }
-        /*if(!$response){
-            throw new Error("Trouble adding user to table");
-            return false;
-        }else{
-            return true;
-        }*/
     }
 
+    public function createNewUserInfo($payload){
+        $fieldArray = array();
+        $valueArray = array();
+
+        $UID = User::getID($payload['username']);
+        array_push($fieldArray, "UID");
+        array_push($valueArray, $UID);
+
+        foreach ($payload as $key => $value) {
+            if($key !== "username"){
+                array_push($fieldArray, $key);
+                array_push($valueArray, $value);
+            }
+        }
+
+        User::insert($fieldArray, $valueArray);
+
+        User::setTable("usertable");
+        User::update(["NewUser"], [0], $UID);
+
+        return true;
+    }
 
     //returns current user
     public function getCurrent($payload){
@@ -61,11 +77,20 @@ class UserController
     //ROUGH AUTHENTICATION> NEEDS TO BE MANAGED
     public function authenticate($payload){
         $user = array();
+        $returnArray = array();
         $user = User::getByUsername($payload['username']);
         if(sizeof($user) == 0) {return false;}
+
+        if($user[0]["NewUser"] == true){
+            array_push($returnArray, true);
+            array_push($returnArray, true);
+        }else{
+            array_push($returnArray, true);
+            array_push($returnArray, false);
+        }
         //$verify = User::verifyPassword($payload['password']);
         //if(!$verify) {return false;}            
-        return true;
+        return $returnArray;
     }
 
     //Delete user by id
