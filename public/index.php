@@ -72,6 +72,17 @@
         return json_encode($UserCall -> createNewUserInfo($data));
     });
 
+
+    //logout endpoint
+    $router->post('/users/logout', function($request) use ($con, $DBInstance, $session){       
+        $session->logout();
+
+        if($session->check_login())
+            return false;
+        else
+            return true;
+    });
+
     //FOR ADMIN::::Grabs all users at a rate of 25 by default and sends them back
     $router->post('users/grab/all', function($request) use ($con, $DBInstance){
         $data = $request->getPayloadData();
