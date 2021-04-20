@@ -1,5 +1,4 @@
 <?php
-
     /*********RESPONSE HEADER CONFIG*********/
     header("Access-Control-Allow-Origin: *");    
     header("Access-Control-Allow-Headers: Content-Type, origin");  
@@ -13,6 +12,7 @@
     /*********MODEL CONTROLLERS*********/
     include_once '../src/Controllers/UserController.php';
     include_once '../src/Controllers/QuestionController.php';
+    include_once '../src/Controllers/MessageController.php';
 
 
     $RequestListener = new Requests();
@@ -32,7 +32,18 @@
         return json_encode($data["username"]);
     });
 
+    //simple post test enpoint
+    $router->post('/session/start', function($request) {
+        session_start();        
+        return json_encode("SESSION STARTED");
+    });
 
+    //simple post test enpoint
+    $router->post('/session/kill', function($request) {
+        session_destroy();        
+        return json_encode("SESSION KILLED");
+    });
+    
     //grab user request, if fields are valid add user
     $router->post("/users/create", function($request) use ($con, $DBInstance){
         $data = $request->getPayloadData();
@@ -52,7 +63,24 @@
         //$RequestUser = $UserCall->getCurrent($data);
         //$session->login($RequestUser);
 
-        $answer = $UserCall -> authenticate($data);
+        //CHANGE THIS TO PROPER AUTHENTICATE
+        $answer = session::authenticate($data);
+        return json_encode($answer);
+    });
+
+    $router -> post("/users/login", function($request) use ($con, $DBInstance, $session){
+        $data = $request->getPayloadData();
+        $UserCall = new UserController($con);
+        $UserCall -> setCurrentTable('usertable');
+        $answer = session::login($data);
+        return json_encode($answer);
+    });
+
+    $router -> post("/users/logout", function($request) use ($con, $DBInstance, $session){
+        $data = $request->getPayloadData();
+        $UserCall = new UserController($con);
+        $UserCall -> setCurrentTable('usertable');
+        $answer = session::logout($data);
         return json_encode($answer);
     });
 
@@ -68,7 +96,7 @@
     $router->post('/users/settings/basicinfo', function($request) use ($con, $DBInstance){
         $data = $request->getPayloadData();
         $UserCall = new UserController($con);
-        $UserCall -> setCurrentTable('userprovider');
+        $UserCall -> setCurrentTable('userdata');
         return json_encode($UserCall -> createNewUserInfo($data));
     });
 
@@ -103,8 +131,32 @@
         $UserCall -> setCurrentTable('usertable');
         $UserCall->delete($data["DeleteUserWithID"]);
         return $UserCall->getAllUsers();
-
     });
 
-   
+    $router -> post("/forum/post/create", function($request) use ($con, $DBInstance, $session){
+        $data = $request->getPayloadData();
+        $UserCall = new UserController($con);
+        $UserCall -> setCurrentTable('userposts');
+        $messageCall = new MessageController($con);
+        $messageCall -> createNewPost($data);
+        return json_encode($messageCall);
+    });
+
+    $router -> post("/forum/post/update", function($request) use ($con, $DBInstance, $session){
+        $data = $request->getPayloadData();
+        $UserCall = new UserController($con);
+        $UserCall -> setCurrentTable('userposts');
+        $messageCall = new MessageController($con);
+        $messageCall -> updateCurrentPost($data);
+        return json_encode($messageCall);
+    });
+
+    $router -> post("/forum/post/delete", function($request) use ($con, $DBInstance, $session){
+        $data = $request->getPayloadData();
+        $UserCall = new UserController($con);
+        $UserCall -> setCurrentTable('userposts');
+        $messageCall = new MessageController($con);
+        $messageCall -> deleteCurrentPost($data);
+        return json_encode($messageCall);
+    });
 ?>

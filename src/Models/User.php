@@ -1,5 +1,6 @@
 <?php
 
+
 require_once __DIR__ . '/Model.php';
 
 class User extends Model
@@ -18,13 +19,44 @@ class User extends Model
         parent::__construct();
     }
 
-    /*public function getByUsername($username){
-        return self::getByField("username", $username);
-    }*/
+    public function hashPassword($password){
+        $salt1 = "JUST";
+        $salt2 = "4YOU";
+        $token = hash("ripemd256", "$salt1$password$salt2");
+        return $token;
+    }
 
     public function verifyPassword($password){
-        //return password_verify($password, $this->password_hash);
-        return true;
+        $salt1 = "JUST";
+        $salt2 = "4YOU";
+        //return password_verify($password, $_SESSION[hash("ripemd256", "$salt1$password$salt2")]);
+        $answer = array();
+        $sql = "SELECT * FROM  usertable  WHERE password = '" . hash("ripemd256", "$salt1$password$salt2") . "'";
+        $result = self::query($sql);
+        if(!$result){
+            throw new error("OH NO");
+            return false;
+        }else{
+            while($row = $result->fetch_row()){
+                $buffer = array(
+                    'Pass' => $row[3],
+                ); 
+                array_push($answer, $buffer);    
+            }
+            return $answer;
+        }
+    }
+    
+    public function recordLogin($UID){
+        $current = date_create();
+        $formatted = date_format($current, 'Y-m-d H:i:s');
+        self::update(array("last_login"), array('"'.$formatted.'"'), $UID);            
+    }
+
+    public function recordLogout($UID){
+        $current = date_create();
+        $formatted = date_format($current, 'Y-m-d H:i:s');
+        self::update(array("last_logout"), array('"'.$formatted.'"'), $UID);        
     }
     
 }

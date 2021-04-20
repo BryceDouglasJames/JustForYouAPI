@@ -8,6 +8,10 @@
         
         function __construct(){
             //create key-value pairings for the request
+            //date_default_timezone_set("EST");
+            //echo 'Now:       '. date('Y-m-d') . "------" . time()/ 3600 % 12 ."\n";                
+            //$date = new DateTime();
+            //echo $date->getTimestamp();
             foreach($_SERVER as $attribute => $value){
                 
                 $this->{

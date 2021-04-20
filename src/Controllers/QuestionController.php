@@ -19,7 +19,9 @@
                     'Question_ID' => $row[0],
                     'Category_ID' => $row[1],
                     'Question_Title' => $row[2],
-                    'Question_Text' => $row[3]
+                    'Question_Text' => $row[3],
+                    'Answers' => $row[4],
+                    'Answer_Weights' => $row[5]
                 ); 
                 array_push($questionArray, $buffer);    
             }
@@ -27,11 +29,9 @@
             
             $index = rand(0, sizeof($questionArray) - 1);
             $returnQuestion = $questionArray[$index];
-
-            $QID = $returnQuestion["Question_ID"];
-            $answers = self::getAnswers($QID);
-
-            $returnQuestion["Answers"] =  $answers["Answers"];
+            //$QID = $returnQuestion["Question_ID"];
+            //$answers = self::getAnswers($QID);
+            //$returnQuestion["Answers"] =  $answers["Answers"];
             return($returnQuestion);
         }
 

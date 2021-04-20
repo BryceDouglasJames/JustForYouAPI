@@ -1,7 +1,7 @@
 <?php
     abstract class Model{
 
-        private static $conn;
+        public static $conn;
         private static $table;
 
         public $id;
@@ -44,6 +44,7 @@
 
             //throw query arguments into array
             for($i = 0; $i < count($cols); $i++){
+                $colString = self::cleanSQL(self::$conn, $colString);
                 if($i === count($cols) - 1){
                     $colString = $colString . $cols[$i];
                 }else{
@@ -51,6 +52,7 @@
                 }
             }
             for($i = 0; $i < count($values); $i++){
+                $valueString = self::cleanSQL(self::$conn, $valueString);
                 if($i === count($values) - 1){
                     $valueString = $valueString . "'" . $values[$i] . "'";
                 }else{
@@ -60,8 +62,8 @@
 
             //send query, throw error if query isn't formatted properly.
             $sql = "INSERT INTO " . self::getTable() . " (" . $colString . ") VALUES (" . $valueString . ")";
+            echo $sql;
             $result = self::query($sql);
-            echo($sql);
             if(!$result){
                 throw new Exception("Error inserting into table.");
             }
@@ -69,11 +71,12 @@
         }
 
         public function update($cols, $values, $updateID){
-            $PRIMARY_KEY_MAP = array("usertable" => "UID", "userprovider" => "PROVID");
+            $PRIMARY_KEY_MAP = array("usertable" => "UID", "userdata" => "PROVID", "session" => "SID", "userposts" => "POSTID");
 
             $updateString = "";
 
             for($i = 0; $i < count($cols); $i++){
+                $updateString = self::cleanSQL(self::$conn, $updateString);
                 if($i === count($values) - 1){
                     $updateString = $updateString . $cols[$i] . "=" . $values[$i];
                 }else{
@@ -81,9 +84,9 @@
                 }
             }
 
-            $sql = "UPDATE  " . self::getTable() . " SET " . $updateString . " where " . self::getTable() . "." . $PRIMARY_KEY_MAP[self::getTable()] . "=" . $updateID . ""; 
+            $sql = "UPDATE  " . self::getTable() . " SET " . $updateString . " where " . self::getTable() . "." . $PRIMARY_KEY_MAP[self::getTable()] . "=" . $updateID . "";
+            echo $sql; 
             $result = self::query($sql);
-            echo($sql);
             if(!$result){
                 throw new Exception("Error updating value in table");
             }
@@ -91,6 +94,7 @@
 
         public function getID($username){
             $id = 0;
+            $username = self::cleanSQL(self::$conn, $username);
             $sql = "SELECT UID FROM usertable WHERE name = '" . $username . "'";
             $result = self::query($sql);
             if(!$result){
@@ -111,6 +115,7 @@
 
         //Grab user ID and delte it accordingly
         public static function deleteById($id){
+            $id = self::cleanSQL(self::$conn, $id);
             $sql = 'DELETE FROM ' . self::getTable() . ' WHERE user_id= ' . $id;
             $entries = self::query($sql);
             return $entries;
@@ -118,6 +123,7 @@
 
         //return user by ID
         public static function getById($id){
+            $id = self::cleanSQL(self::$conn, $id);
             $entries = self::getByField('id', $id);
             if ($entries == null) return null;
             return $entries[0];
@@ -127,6 +133,7 @@
         //Grab by username and send back an array of selected user props
         public static function getByUsername($username){
             $answer = array();
+            $username = self::cleanSQL(self::$conn, $username);
             $sql = "SELECT * FROM " . self::getTable() . " WHERE name = '" . $username . "'";
             $result = self::query($sql);
             if(!$result){
@@ -149,6 +156,8 @@
         
         //sends query based off of specified columns
         public static function getByField($field, $value){
+            $field = self::cleanSQL(self::$conn, $field);
+            $value = self::cleanSQL(self::$conn, $value);
             $sql = 'SELECT * FROM ' . self::getTable() . ' WHERE ' . $field . '='. $value;
             $entries = self::query($sql);
             return $entries;
@@ -159,7 +168,7 @@
         }
 
         public static function getAllQuestions(){
-            $sql = 'SELECT * FROM questions LIMIT 0,100';
+            $sql = 'SELECT * FROM answers LIMIT 0,100';
             $questions = self::query($sql);
             if(!$questions){
                 throw new Error("Cannot get questions.");
@@ -173,6 +182,7 @@
         }
 
         public static function getAnswerByID($id){
+            $id = self::cleanSQL(self::$conn, $id);
             $sql = 'SELECT * FROM responses WHERE QUID = 1';
 
             $answer = self::query($sql);
@@ -181,6 +191,19 @@
             }else{
                 return $answer;
             }
+        }
+
+        public function cleanSQL($connection, $token){
+            return self::mysql_entities_fix_string($connection, $token);
+        }
+        public function mysql_entities_fix_string($connection, $string){
+            return self::mysql_fix_string($connection, $string);
+        }
+        public function mysql_fix_string($connection, $string){
+            if (get_magic_quotes_gpc()) {
+                $string = stripslashes($string);
+            }
+            return $string;
         }
 
 
@@ -222,7 +245,7 @@
 
 
         //sends simple query across
-        private function query($sql){
+        public function query($sql){
             $result = self::$conn -> query($sql);
             return $result;
         }
@@ -236,7 +259,7 @@
             self::$table = $thisTable;
         }
 
-        private function getTable(){
+        public function getTable(){
             return self::$table;
         }
     }
