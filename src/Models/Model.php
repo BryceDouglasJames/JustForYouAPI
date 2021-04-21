@@ -62,7 +62,7 @@
 
             //send query, throw error if query isn't formatted properly.
             $sql = "INSERT INTO " . self::getTable() . " (" . $colString . ") VALUES (" . $valueString . ")";
-            echo $sql;
+            //echo $sql;
             $result = self::query($sql);
             if(!$result){
                 throw new Exception("Error inserting into table.");
@@ -85,7 +85,7 @@
             }
 
             $sql = "UPDATE  " . self::getTable() . " SET " . $updateString . " where " . self::getTable() . "." . $PRIMARY_KEY_MAP[self::getTable()] . "=" . $updateID . "";
-            echo $sql; 
+            //echo $sql; 
             $result = self::query($sql);
             if(!$result){
                 throw new Exception("Error updating value in table");
