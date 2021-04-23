@@ -34,7 +34,7 @@ class UserController
             return false;
         }else{
             $password = User::hashPassword($payload['password']);
-            $cols = array("name", "email", "password", "newuser");
+            $cols = array("name", "email", "password", "newuser", );
             $vals = array($payload['username'], $payload['email'], $password, true);
             $response = User::insert($cols, $vals);
             return true;
@@ -75,7 +75,21 @@ class UserController
         return $thisUser;
     }
 
-
+    public function setPFP($payload){
+        $user = User::getByUsername($payload['username']);
+        if(!$user || $user[0]["UID"] != $payload["session_id"]){
+            throw new error("User does not have permission with credentials");
+            return false;
+        }else{
+            self::setCurrentTable("userdata");
+            $pfp  = $payload["file"];
+            $cols = array("ProfilePic");
+            $vals = array($pfp);
+            User::update($cols, $vals, base64_encode($payload['username']));
+            return true;
+        }
+        
+    }
 
     //Delete user by id
     public function delete($id){

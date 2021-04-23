@@ -29,9 +29,10 @@ class Session
         $password = User::verifyPassword($payload["password"]);
         if($user = $payload['username'] && sizeof($password) != 0){
             $UID = User::getID($payload['username']);
-            User::recordLogin($UID);
+			User::recordLogin($UID);
             return $UID;
         }else{
+			
             return false;
         }
 	}

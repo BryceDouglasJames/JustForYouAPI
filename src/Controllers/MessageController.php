@@ -56,6 +56,27 @@ class MessageController
         }
         
     }
+
+    public function returnAllPosts(){
+        $returnArray = array();
+        $sql = 'SELECT * FROM userposts LIMIT 100';
+        $result = Message::query($sql);        
+        while($row = $result->fetch_row()){
+            $buffer = array(
+                'POSTID' => $row[0],
+                'UID' => $row[1],
+                'CID' => $row[2],
+                'title' => $row[3],
+                'author' => $row[4],
+                'likes' => $row[5],
+                'image' => $row[6],
+                'body' =>  $row[7],
+                'created_at' => $row[8]
+            );                   
+            array_push($returnArray, $buffer);
+        }
+        return $returnArray;
+    }
 }
 
 ?>

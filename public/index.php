@@ -100,17 +100,6 @@
         return json_encode($UserCall -> createNewUserInfo($data));
     });
 
-
-    //logout endpoint
-    $router->post('/users/logout', function($request) use ($con, $DBInstance, $session){       
-        $session->logout();
-
-        if($session->check_login())
-            return false;
-        else
-            return true;
-    });
-
     //FOR ADMIN::::Grabs all users at a rate of 25 by default and sends them back
     $router->post('users/grab/all', function($request) use ($con, $DBInstance){
         $data = $request->getPayloadData();
@@ -142,6 +131,15 @@
         return json_encode($messageCall);
     });
 
+    $router -> post("/users/set/pfp", function($request) use ($con, $DBInstance, $session){
+        $data = $request->getPayloadData();
+        $UserCall = new UserController($con);
+        $UserCall -> setCurrentTable('usertable');
+    
+        $answer = $UserCall->setPFP($data);
+        return json_encode($answer);
+    });
+
     $router -> post("/forum/post/update", function($request) use ($con, $DBInstance, $session){
         $data = $request->getPayloadData();
         $UserCall = new UserController($con);
@@ -149,6 +147,12 @@
         $messageCall = new MessageController($con);
         $messageCall -> updateCurrentPost($data);
         return json_encode($messageCall);
+    });
+
+    $router -> get("/forum/post/getall", function($request) use ($con, $DBInstance, $session){
+        $data = $request->getPayloadData();
+        $messageCall = new MessageController($con);
+        return json_encode($messageCall -> returnAllPosts());
     });
 
     $router -> post("/forum/post/delete", function($request) use ($con, $DBInstance, $session){

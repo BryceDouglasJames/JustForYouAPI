@@ -74,4 +74,9 @@ class Message extends Model
         return $entries;
     }
     
+    public function getAllPosts(){
+        $sql = 'SELECT * FROM userposts LIMIT 100';
+        $entries = self::query($sql);
+        return $entries;
+    }
 }
