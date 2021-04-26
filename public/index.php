@@ -163,4 +163,13 @@
         $messageCall -> deleteCurrentPost($data);
         return json_encode($messageCall);
     });
+
+    $router -> post("/forum/post/like", function($request) use ($con, $DBInstance, $session){
+        $data = $request->getPayloadData();
+        $UserCall = new UserController($con);
+        $UserCall -> setCurrentTable('userposts');
+        $messageCall = new MessageController($con);
+        $messageCall -> likeCurrentPost($data);
+        return json_encode($messageCall);
+    });
 ?>

@@ -73,6 +73,12 @@ class Message extends Model
         $entries = self::query($sql);
         return $entries;
     }
+
+    public function likePost($id){
+        $post = self::getPost($id);
+        $newLikeAmount = $post[0]["likes"] + 1;
+        return self::update(array("likes"), array($newLikeAmount), $id);
+    }
     
     public function getAllPosts(){
         $sql = 'SELECT * FROM userposts LIMIT 100';

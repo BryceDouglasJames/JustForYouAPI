@@ -22,11 +22,8 @@ class MessageController
         $category = $payload["category"];
         $body = $payload["body"];
         $image = null;
-        if($payload["image"]){
-            $image = $payload["MessageImage"];
-        }
-
-        $valueArray = array($UID, $category, $title, $author, 0, $image, $body, $formattedTime, $formattedTime);
+        
+        $valueArray = array($UID, $category, $title, $author, 0, "", $body, $formattedTime, $formattedTime);
         return Message::createPost($UID, $valueArray);
     }
 
@@ -41,6 +38,10 @@ class MessageController
         }else{
             throw new error("This user does not have privilage to change post.");
         }
+    }
+
+    public function likeCurrentPost($payload){
+        return Message::likePost($payload["post_id"]);
     }
 
     public function deleteCurrentPost($payload){
