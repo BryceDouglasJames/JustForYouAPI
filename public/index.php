@@ -92,6 +92,27 @@
         return $question;
     });
 
+    //grab random question/answers and return it to client
+    $router -> post("/grab/question/category", function($request) use ($con, $DBInstance, $session){
+        $data = $request->getPayloadData();
+        $controller = new QuestionController($con);
+        $question = $controller -> questionByCategory($data);
+        $question = json_encode($question);
+        return $question;
+    });
+
+    //grab random question/answers and return it to client
+    $router -> post("/grab/question/answered", function($request) use ($con, $DBInstance, $session){
+        $data = $request->getPayloadData();
+        print_r($data);
+        $UserCall = new UserController($con);
+        $UserCall -> setCurrentTable('usertable');
+        $controller = new QuestionController($con);
+        $question = $controller -> answerQuestion($data);
+        $question = json_encode($question);
+        return $question;
+    });
+
 
     $router->post('/users/settings/basicinfo', function($request) use ($con, $DBInstance){
         $data = $request->getPayloadData();

@@ -16,26 +16,6 @@
         }
 
 
-        //query all the users, return array of JSON objects
-        public function getAllUserData(){
-            $returnTable = array();
-            $result = self::query("SELECT * FROM " . self::getTable());
-            if(!$result){
-                throw new Exception("There are no users in selected table.");
-            }else {
-                while($row = $result->fetch_row()){
-                    $buffer = array(
-                        'UID' => $row[0],
-                        'Name' => $row[1],
-                        'Email' => $row[2],
-                        'Pass' => $row[3]
-                    );                   
-                    array_push($returnTable, $buffer);
-                }
-            }
-            return $returnTable;
-        }
-
         //insert data in model table 
         public function insert($cols, $values){
             //value buffers
@@ -62,7 +42,7 @@
 
             //send query, throw error if query isn't formatted properly.
             $sql = "INSERT INTO " . self::getTable() . " (" . $colString . ") VALUES (" . $valueString . ")";
-            //echo $sql;
+            echo $sql;
             $result = self::query($sql);
             if(!$result){
                 throw new Exception("Error inserting into table.");
@@ -107,53 +87,6 @@
             return $id;
         }
 
-        //update record by selected ID with field values
-        public function updateById($id, $fields){
-           
-        }
-
-
-        //Grab user ID and delte it accordingly
-        public static function deleteById($id){
-            $id = self::cleanSQL(self::$conn, $id);
-            $sql = 'DELETE FROM ' . self::getTable() . ' WHERE user_id= ' . $id;
-            $entries = self::query($sql);
-            return $entries;
-        }
-
-        //return user by ID
-        public static function getById($id){
-            $id = self::cleanSQL(self::$conn, $id);
-            $entries = self::getByField('id', $id);
-            if ($entries == null) return null;
-            return $entries[0];
-        }
-
-
-        //Grab by username and send back an array of selected user props
-        public static function getByUsername($username){
-            $answer = array();
-            $username = self::cleanSQL(self::$conn, $username);
-            $sql = "SELECT * FROM " . self::getTable() . " WHERE name = '" . $username . "'";
-            $result = self::query($sql);
-            if(!$result){
-                return false;
-            }else{
-                while($row = $result->fetch_row()){
-                    $buffer = array(
-                        'UID' => $row[0],
-                        'Name' => $row[1],
-                        'Email' => $row[2],
-                        'Pass' => $row[3],
-                        'NewUser' => $row[4]
-                    ); 
-                    array_push($answer, $buffer);    
-                }
-                return $answer;
-            }
-        }
-
-        
         //sends query based off of specified columns
         public static function getByField($field, $value){
             $field = self::cleanSQL(self::$conn, $field);
@@ -163,36 +96,6 @@
             return $entries;
         }
         
-        public static function createUserInfo($field){
-            
-        }
-
-        public static function getAllQuestions(){
-            $sql = 'SELECT * FROM answers LIMIT 0,100';
-            $questions = self::query($sql);
-            if(!$questions){
-                throw new Error("Cannot get questions.");
-            }else{
-                return $questions;
-            }
-        }
-
-        public static function getAllAnswers(){
-
-        }
-
-        public static function getAnswerByID($id){
-            $id = self::cleanSQL(self::$conn, $id);
-            $sql = 'SELECT * FROM responses WHERE QUID = 1';
-
-            $answer = self::query($sql);
-            if(!$answer){
-                throw new Error("Cannot get answers from provided ID.");
-            }else{
-                return $answer;
-            }
-        }
-
         public function cleanSQL($connection, $token){
             return self::mysql_entities_fix_string($connection, $token);
         }

@@ -23,7 +23,8 @@ class MessageController
         $body = $payload["body"];
         $image = null;
         
-        $valueArray = array($UID, $category, $title, $author, 0, "", $body, $formattedTime, $formattedTime);
+        $valueArray = array($UID, $category, $title, $author, 0, $image, $body, $formattedTime, $formattedTime);
+        print_r($valueArray);
         return Message::createPost($UID, $valueArray);
     }
 
