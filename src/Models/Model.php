@@ -51,7 +51,7 @@
         }
 
         public function update($cols, $values, $updateID){
-            $PRIMARY_KEY_MAP = array("usertable" => "UID", "userdata" => "PROVID", "session" => "SID", "userposts" => "POSTID");
+            $PRIMARY_KEY_MAP = array("usertable" => "UID", "userdata" => "PROVID", "session" => "SID", "userposts" => "POSTID", "weeklyscores" => "SCOREID");
 
             $updateString = "";
 
@@ -65,7 +65,7 @@
             }
 
             $sql = "UPDATE  " . self::getTable() . " SET " . $updateString . " where " . self::getTable() . "." . $PRIMARY_KEY_MAP[self::getTable()] . "=" . $updateID . "";
-            //echo $sql; 
+            echo $sql; 
             $result = self::query($sql);
             if(!$result){
                 throw new Exception("Error updating value in table");
@@ -109,31 +109,6 @@
             return $string;
         }
 
-
-        /*//SAVE FOR FUTURE WHEN WE ARE HASHING PASSWORDS AND RESPONSES
-        public static function getPrivateFields($arr){
-            $obj = new static();
-            foreach ($arr as $field => $value) {
-                $obj->$field = $value;
-            }
-            return $obj;
-        }
-
-        public function setPrivateFields(){
-            $fields = get_public_vars($this);
-            foreach ($this->private_fields as $key) {
-                unset($fields[$key]);
-            }
-            return $fields;
-        }
-
-        private function getUniqueFields()
-        {
-            return array_diff(
-                array_keys(get_public_vars($this)),
-                ["id", "created_at", "updated_at", "deleted_at"]
-            );
-        }*/
 
         //checks to make sure Database is alive
         public function pingServer($thisCon){

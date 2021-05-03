@@ -46,9 +46,9 @@
             }
         }
 
-        public static function recordResponse($UID, $AID, $answer, $weight){
-            $cols = array("UID", "AID", "UserChoice", "ChoiceWeight");
-            $vals = array($UID, $AID, $answer, $weight);
+        public static function recordResponse($UID, $AID, $CAID, $answer, $weight){
+            $cols = array("UID", "AID", "CAID", "UserChoice", "ChoiceWeight");
+            $vals = array($UID, $AID, $CAID, $answer, $weight);
             self::setTable("responses");
             $answer = self::insert($cols, $vals);
         }

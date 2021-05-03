@@ -66,6 +66,7 @@
         public function answerQuestion($payload){
             $questionArray = array();
             $AID = $payload["AID"];
+            $CAID = $payload["CAID"];
             $AnswerIndex = $payload["questionAnswer"];
             $user = User::getByUsername($payload["username"]);
             $UID = $user[0]["UID"];
@@ -92,7 +93,7 @@
             //return $weight;
 
             //TODO now that we have question weight, add to user response and trigger ML assistant
-            return Question::recordResponse($UID, $AID, $AnswerIndex, $weight);
+            return Question::recordResponse($UID, $AID, $CAID, $AnswerIndex, $weight);
         }
 
     }

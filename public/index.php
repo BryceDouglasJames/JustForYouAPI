@@ -13,6 +13,8 @@
     include_once '../src/Controllers/UserController.php';
     include_once '../src/Controllers/QuestionController.php';
     include_once '../src/Controllers/MessageController.php';
+    include_once '../src/Controllers/MLAssistantController.php';
+
 
 
     $RequestListener = new Requests();
@@ -26,24 +28,6 @@
        return("HELLO WORLD :)");
     });
 
-    //simple post test enpoint
-    $router->post('/data', function($request) {
-        $data = $request->getPayloadData();
-        return json_encode($data["username"]);
-    });
-
-    //simple post test enpoint
-    $router->post('/session/start', function($request) {
-        session_start();        
-        return json_encode("SESSION STARTED");
-    });
-
-    //simple post test enpoint
-    $router->post('/session/kill', function($request) {
-        session_destroy();        
-        return json_encode("SESSION KILLED");
-    });
-    
     //grab user request, if fields are valid add user
     $router->post("/users/create", function($request) use ($con, $DBInstance){
         $data = $request->getPayloadData();
@@ -58,10 +42,6 @@
         $data = $request->getPayloadData();
         $UserCall = new UserController($con);
         $UserCall -> setCurrentTable('usertable');
-
-        //USE FOR LOGGIN
-        //$RequestUser = $UserCall->getCurrent($data);
-        //$session->login($RequestUser);
 
         //CHANGE THIS TO PROPER AUTHENTICATE
         $answer = session::authenticate($data);
@@ -104,13 +84,12 @@
     //grab random question/answers and return it to client
     $router -> post("/grab/question/answered", function($request) use ($con, $DBInstance, $session){
         $data = $request->getPayloadData();
-        print_r($data);
         $UserCall = new UserController($con);
         $UserCall -> setCurrentTable('usertable');
         $controller = new QuestionController($con);
         $question = $controller -> answerQuestion($data);
-        $question = json_encode($question);
-        return $question;
+        $MLCall = new MLAssistantController($con);
+        return json_encode($MLCall -> updateScore($data));
     });
 
 
@@ -192,5 +171,20 @@
         $messageCall = new MessageController($con);
         $messageCall -> likeCurrentPost($data);
         return json_encode($messageCall);
+    });
+
+    $router -> post("/user/updateScore", function($request) use ($con, $DBInstance, $session){
+        $data = $request->getPayloadData();
+        $UserCall = new UserController($con);
+        $messageCall = new MLAssistantController($con);
+        return json_encode($messageCall -> updateScore($data));
+    });
+
+    $router -> post("/testing/scores", function($request) use ($con, $DBInstance, $session){
+        $data = $request->getPayloadData();
+        $UserCall = new UserController($con);
+        $messageCall = new MLAssistantController($con);
+        return json_encode($messageCall -> getUserScore($data));
+        //return $messageCall -> train();
     });
 ?>

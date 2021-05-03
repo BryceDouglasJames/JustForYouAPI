@@ -51,7 +51,7 @@ class User extends Model
     public static function getByUsername($username){
         $answer = array();
         $username = self::cleanSQL(self::$conn, $username);
-        $sql = "SELECT * FROM " . self::getTable() . " WHERE name = '" . $username . "'";
+        $sql = "SELECT * FROM usertable WHERE name = '" . $username . "'";
         $result = self::query($sql);
         if(!$result){
             return false;
