@@ -25,6 +25,12 @@
 
         //interface method
         public function getPayloadData(){
+
+            /*
+            *   THIS IS EXPENDABLE
+            *   YOU MAY EASILY ADD METHOD HANDLERS FOR EACH REQUEST, THIS PROJECT ONLY REQUIRED
+            *   A SIMPLE POST/GET INTERFACE BUT PLENTY MORE CAN BE DONE
+            */
             if($this->REQUEST_METHOD === "GET"){
                 return;
             }

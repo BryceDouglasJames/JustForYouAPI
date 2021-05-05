@@ -12,59 +12,86 @@ class UserController
         User::useConnection($con);
     }
 
-    //ADMIN FUNCTION return all users at a limit of 25
+    /*
+    *  ADMIN FUNCTION
+    *  RETURN ALL USERS AT A LIMIT OF 25
+    */
     public function getAllUsers(){
         $response = User::getAllUserData();
         return json_encode($response);
     }
 
 
-    //checks request payload that contains user signup info and stores if okay
+    /*
+    *  CHECKS REQUEST PAYLOAD THAT CONTAINS USER SIGNUP INFO AND STORES USER INTO TABLE
+    *  IF EVERYTHING IS OKAY
+    */
     public function addUser($payload){
         if ($payload['username'] === "" || $payload['username'] === "undefined") {
-            //throw new Error("Username cannot be empty");
             return false;
         }
         else if ($payload['email'] === "" || $payload['email'] === "undefined") {
-            //throw new Error("Email cannot be empty");
             return false;
         }
         else if ($payload['password'] === "" || $payload['password'] === "undefined") {
-            //throw new Error("Password cannot be empty");
             return false;
         }else{
             $password = User::hashPassword($payload['password']);
             $cols = array("name", "email", "password", "newuser", );
             $vals = array($payload['username'], $payload['email'], $password, true);
             $response = User::insert($cols, $vals);
+
+            /*
+            *   WE IDENTIFY EACH USER INTO THE WEEKLY SCORE TABLE BY HAVING 
+            *   SELECTED CATEGORY FOLLOWED BY THEIR ENCODED USERNAME
+            * 
+            *   EXAMPLE: DIET_(ENCODED USERNAME)
+            *            FITNESS_(ENCODED USERNAME)
+            *
+            *   THAT WAY WE CAN DITINGUESH USERS EASIER AND HAVE LESS COLS
+            */
+            $encryptID = base64_encode($payload['username']);
+            $user = User::getByUsername($payload['username']);
+            $UID = $user[0]["UID"];
+            User::setTable("weeklyscores");
+            $cols = array("SCOREID", "UID", 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday');
+            $val1 = array("Diet_".$encryptID, $UID, 0,0,0,0,0,0,0);
+            $response = User::insert($cols, $val1);
+            $val2 = array("Fitness_".$encryptID, $UID, 0,0,0,0,0,0,0);
+            $response = User::insert($cols, $val2);
+            $val3 = array("Mental_".$encryptID, $UID, 0,0,0,0,0,0,0);
+            $response = User::insert($cols, $val3);
+            $val4 = array("Personal_".$encryptID, $UID, 0,0,0,0,0,0,0);
+            $response = User::insert($cols, $val4);
             return true;
         }
     }
 
+
+    /*
+    *   INGEST REQUEST PAYLIAD AND CREATE PROFILE INSIDE OF USER ACCESS TABLE 
+    */
     public function createNewUserInfo($payload){
         $fieldArray = array();
         $valueArray = array();
-
         $UID = User::getID($payload['username']);
         array_push($fieldArray, "UID");
         array_push($valueArray, $UID);
-
         foreach ($payload as $key => $value) {
             if($key !== "username"){
                 array_push($fieldArray, $key);
                 array_push($valueArray, $value);
             }
         }
-
         User::insert($fieldArray, $valueArray);
-
         User::setTable("usertable");
         User::update(["NewUser"], [0], $UID);
-
         return true;
     }
 
-    //returns current user
+    /*
+    *  RETURNS CURRENT USER
+    */    
     public function getCurrent($payload){
         $user = User::getByUsername($payload['username']);
         if(!$thisUser){ 
@@ -75,6 +102,10 @@ class UserController
         return $thisUser;
     }
 
+    /*
+    *  TODO
+    *  ONCE IMAGE STORAGE ANGENT IS ESTABLISHED, HANDLE PROFILE PICTURE STORAGE
+    */
     public function setPFP($payload){
         $user = User::getByUsername($payload['username']);
         if(!$user || $user[0]["UID"] != $payload["session_id"]){
@@ -91,13 +122,20 @@ class UserController
         
     }
 
-    //Delete user by id
+    /*
+    *  DELETE USER BY ID
+    */    
     public function delete($id){
         $response = User::deleteById($id);
         return json_encode($response);
     }
 
-    //sets instance table
+    /*
+    *  TODO
+    *   OH MY GOD, FIX THIS!
+    *   WHY DOES EVERY INDEX REDIRECT USE THIS TO DECLARE INSTANCE DB TABLE REFERENCE?
+    *   PLZ FIX THIS
+    */    
     public function setCurrentTable($thisTable){
         User::setTable($thisTable);
     }

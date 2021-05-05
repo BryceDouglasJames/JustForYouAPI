@@ -14,12 +14,19 @@ class Message extends Model
         parent::__construct();
     }
 
+
+    /*
+    *   TECHNICALLY AN INTERFACE FOR USER POST REQUEST THAT HANDLES RECORD INSERTION
+    */
     public function createPost($uid, $content){
         $cols = array("UID", "CID", "title", "author", "likes", "image", "body", "created_at", "updated_at");
         $vals = $content;
         return self::insert($cols, $vals);
     }
 
+    /*
+    *   GRABS POST BY ID AND RETURNS POST OBJECT FOR HYDRATION ON FRONT END
+    */
     public function getPost($id){
         $answer = array();
         $id = self::cleanSQL(self::$conn, $id);
@@ -47,6 +54,10 @@ class Message extends Model
         }
     }
 
+    /*
+    *   COMES AFTER USER AUTHENTIATION
+    *   ALIGNES KEYS AND POSHES VALUES TO BE STORED IN DB
+    */
     public function updatePost($payload, $post){
         $cols = array();
         $vals = array();
@@ -61,25 +72,33 @@ class Message extends Model
                 throw new error("unexpected values for updating post.");
             }
         }
-
         array_push($cols, "updated_at");
         array_push($vals, "'".$formattedTime."'");
-
         return Message::update($cols, $vals, $payload["post_id"]);
     }
 
+
+    /*
+    *   SIMPLY GRABS POST BY ID AND DELETES RECORD
+    */
     public function deletePost($post){
         $sql = 'DELETE FROM userposts WHERE POSTID= ' . $post[0]["POSTID"];
         $entries = self::query($sql);
         return $entries;
     }
 
+    /*
+    *   GRABS POST AND INCREMENTS LIKE VALUE
+    */
     public function likePost($id){
         $post = self::getPost($id);
         $newLikeAmount = $post[0]["likes"] + 1;
         return self::update(array("likes"), array($newLikeAmount), $id);
     }
     
+    /*
+    *   STRUCTURES QUERY TO RECIEVE FIRST 100 POST RESULTS
+    */
     public function getAllPosts(){
         $sql = 'SELECT * FROM userposts LIMIT 100';
         $entries = self::query($sql);

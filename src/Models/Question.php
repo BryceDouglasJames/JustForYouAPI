@@ -14,6 +14,10 @@
             parent::__construct();
         }
         
+
+        /*
+        *   GRABS ALL QUESTIONS BASED ON SUPPLIES CATEGORY
+        */
         public function getQuestionByCategory($category){
             $category = self::cleanSQL(self::$conn, $category);
             $sql = 'SELECT * FROM answers WHERE CAID = ' . (int)$category;
@@ -25,6 +29,9 @@
             }
         }
 
+        /*
+        *   GRABS QUESTION BY ID AND RETURN QUERY ONJECY
+        */
         public function getQuestionByID($id){
             $id = self::cleanSQL(self::$conn, $id);
             $sql = 'SELECT * FROM answers WHERE AID = ' . (int)$id;
@@ -36,6 +43,9 @@
             }
         }
 
+        /*
+        *   GET ALL QUESTIONS FROM BAD UP TO THE FIRST 100 AND RETURN QUERY OBJECT
+        */
         public static function getAllQuestions(){
             $sql = 'SELECT * FROM answers LIMIT 0,100';
             $questions = self::query($sql);
@@ -46,6 +56,10 @@
             }
         }
 
+
+        /*
+        *   MAP USER ANSWER RESPONSE AND INSERT INTO DB
+        */
         public static function recordResponse($UID, $AID, $CAID, $answer, $weight){
             $cols = array("UID", "AID", "CAID", "UserChoice", "ChoiceWeight");
             $vals = array($UID, $AID, $CAID, $answer, $weight);
@@ -53,6 +67,9 @@
             $answer = self::insert($cols, $vals);
         }
 
+        /*
+        *   GRAB QUESTION ANSWER BY ITS ID AND RETURN QUERY OBJECT
+        */
         public static function getAnswerByID($id){
             $id = self::cleanSQL(self::$conn, $id);
             $sql = 'SELECT * FROM responses WHERE QUID = 1';

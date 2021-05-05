@@ -12,6 +12,10 @@
             Question::useConnection($con);
         }
 
+
+        /*
+        *   Method grabs all questions and returns a random index to client
+        */
         public function getRandomQuestion(){
             $questionArray = array();
             $questions = Question::getAllQuestions();
@@ -31,6 +35,10 @@
             return($returnQuestion);
         }
 
+
+        /*
+        *   Method queries question by category and returns to client
+        */
         public function questionByCategory($payload){
             $questionArray = array();
             $question = Question::getQuestionByCategory($payload["category"]);
@@ -45,11 +53,16 @@
                 ); 
                 array_push($questionArray, $buffer);    
             }
+            //print_r($questionArray);
             $index = rand(0, sizeof($questionArray) - 1);
             $returnQuestion = $questionArray[$index];
             return $returnQuestion;
         }
 
+        /*
+        *   Method queries question from DB and grabs their answrs to return to client
+        *   question popup.
+        */
         public function getAnswers($Question_ID){
             $val = array();
             $answers = Question::getAnswerByID($Question_ID);
@@ -63,6 +76,12 @@
             return $val;
         }
 
+
+        /*
+        *   Method ingests user question response payload, retieves user properties from
+        *   DB, decodes question weights from row, and stores update into table and trigger ML 
+        *   assistant update
+        */
         public function answerQuestion($payload){
             $questionArray = array();
             $AID = $payload["AID"];
@@ -90,9 +109,7 @@
                     break;
                 }
             }
-            //return $weight;
 
-            //TODO now that we have question weight, add to user response and trigger ML assistant
             return Question::recordResponse($UID, $AID, $CAID, $AnswerIndex, $weight);
         }
 

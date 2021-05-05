@@ -12,6 +12,10 @@
             parent::__construct();
         }
 
+        /*
+        *   Ingest payload, decode category and trigger ML assistant score update
+        *   and reocrd score into weekly table
+        */
         public static function updateUserScore($payload){
             $category = null;
             switch($payload["CAID"]){
@@ -32,15 +36,17 @@
             $thisday = self::getDayOfWeek();
             $thiscategory = $payload["CAID"];
             $encodedKey = base64_encode(self::cleanSQL(self::$conn, $payload['username']));
-            $thisScore = self::assistant_model($payload);    //TODO generate this score from regression model based on user prediction
+            $thisScore = self::assistant_model($payload);  
 
             $cols = array($thisday);
             $vals = array($thisScore);
             self::update($cols, $vals, "'".$category."_".$encodedKey."'");
-
-            
         }
 
+
+        /*
+        *   Simply grabs day of the week and encodes string
+        */
         public static function getDayOfWeek(){
             $current = time();
             $day = (floor((int)$current / 86400) + 4) % 7;
@@ -73,6 +79,11 @@
             return $day;
         }
         
+
+        /*
+        *   Grab user profile, grab activity record from weekly scores table
+        *   and return results as array 
+        */
         public static function getUserProgressRecord($payload){
             $returnArray = array();
             $username = $payload["username"];
@@ -99,6 +110,11 @@
             return $returnArray;
         }
 
+        
+        /*
+        *   Retrieves user profile and queries for all tehir responses for a category
+        *   This data is used to create mapping to feed into regression model
+        */
         public static function getResponsesByCategory($payload){
             $returnArray = array();
             $average = 0;
@@ -110,7 +126,7 @@
                 throw new error("Error finding activity record.");
             }else{
                 while($row = $answer->fetch_row()){
-                    $buffer = array(1, rand(1, 100), $row[5]);
+                    $buffer = array(3, rand(1, 100), $row[5]);
                     $average += (float) $row[5]; 
                     array_push($returnArray, $buffer); 
                 }
@@ -118,6 +134,16 @@
             return array($returnArray, $average/sizeof($returnArray));
         }
 
+        /*
+        *   TODO
+        *   Fix error function. Prediction is too good because there is little data
+        *   or the dependent variable is not correlated 
+        *
+        *   If learning rate is too fast, we wil get a huge prediction for x amount of time accross their
+        *   progress
+        *
+        *   NEEDS WORK
+        */
         public static function assistant_model($payload){
             $digestedResponse = self::getResponsesByCategory($payload);
             $data = $digestedResponse[0];
@@ -126,6 +152,7 @@
 
             $learningRate = 0.00000001;
 
+            //ONLY A FEW EPOCHS FOR STANDARD RESULTS
             for ($i = 0; $i < 10; $i++) {
 
                 //FIX THIS FUNCTION IF ABLE
@@ -136,11 +163,13 @@
                 $const1 = $correctConst1; 
                 $const2 = $correctConst2;
             }
-
             return (int)$const1 - (int)$const2;
         }
 
-
+        /*
+        *   NO IDEA WHAT IS WRONG, BUT OH WELL
+        *   SUPPOSED TO RETURN FLOAT ERROR FOR CONSTANT
+        */
         public static function error_function($const1, $const2, $data){
             $n = sizeof($data);
             self::$thisSum = 0;
@@ -152,10 +181,12 @@
                     $data
                 );
             }
-
             return self::$thisSum/$n;
         }
 
+        /*
+        *   REALLY ROUGH IMPLEMNTATION OF GRADIENT DECENT INVOLVING SECONDARY CAL TO MAP SUMMATION
+        */
         public static function gradient_decent($CurrentPosition, $const1, $const2, $data){
             $n = sizeof($data);
             $firstHalf = -2/$n;
@@ -165,13 +196,18 @@
             return $firstHalf * $summation;
         }
 
+
+        /*
+        *   FUNCTION INVOLVING THE SUMMATION SUM AND APPLYING 
+        */
         public static function decentSummationFunction($CurrentPosition, $const1, $const2, $data){
             self::$thisSum = 0;
             for($i = 0; $i < sizeof($data); $i++){
                 array_map(
+                    //COST FUNCTION
                     function ($position) use ($CurrentPosition, $const1, $const2) {
+                        //COULD SEPERATE LINEAR EQUATION BUT OH WELL
                         self::$thisSum += ($position[2] - ($const1 * $position[0] + $const2 * $position[1]) * $position[$CurrentPosition]);
-                        //print_r($position);
                     },
                     $data
                 );
@@ -179,12 +215,14 @@
             return self::$thisSum;  
         }
 
+        /*
+        *   ADJUST CONSTANT FOR EACH ASSISTANT ITERATION
+        */
         public static function fixConst1($learningRate, $const1, $const2, $data){
             return $const1 - $learningRate * self::gradient_decent(0, $const1, $const2, $data);
         }
-
         public static function fixConst2($learningRate, $const1, $const2, $data){
             return $const2 - $learningRate * self::gradient_decent(1, $const1, $const2, $data);
-
         }
+
     }

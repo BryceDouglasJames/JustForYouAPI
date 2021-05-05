@@ -12,16 +12,12 @@ class Session
 	
 	//creates a session when an instance of this class is created
 	function _construct()
-	{	
-		//$this->verify_login();
-	}
+	{		}
 
-	//Simple getter for login status
-	public function check_login()
-	{
-		return $this->logged_in;
-	}
-
+	/*
+    *  GRAB REQUESTED USER PROFILE, VERIFY PASSWORD AND 
+	*  RECORD LOGIN FOR SESSION INITIALIZATION  
+    */
 	public function login($payload){
         $user = array();
         $returnArray = array();
@@ -37,6 +33,10 @@ class Session
         }
 	}
 
+	/*
+    *  GRAB REQUESTED USER PROFILE, VERIFY PASSWORD AND 
+	*  RECORD LOGOUT TO KILL SESSION
+    */
 	public function logout($payload){
         $user = array();
         $returnArray = array();
@@ -50,8 +50,13 @@ class Session
         }
 	}
 
-	//ROUGH AUTHENTICATION> NEEDS TO BE MANAGED
-    public function authenticate($payload){
+	/*
+    *	TODO  
+	*  	MANAGE AUTHENTICATION A LITTLE MORE SOUNDLY AFTER MIGRATION
+	*	ONLY THING WRONG IS THAT THIS IS HANDLING NEW USER SIGNIN AND 
+	*	AUTHENTICATION AFTER EVERY REQUEST...NOT GOOD
+    */    
+	public function authenticate($payload){
         $user = array();
         $returnArray = array();
         $user = User::getByUsername($payload['username']);
@@ -73,35 +78,8 @@ class Session
             array_push($returnArray, false);
 			array_push($returnArray, false);
 			return $returnArray;
-        }
-        
-        
+        }   
     }
-
-	//Upon Login, Associate user sessions
-	public function addSession($user)
-	{
-		
-	}
-
-	//instead of destroying session, unset session variables
-	public function endSession($data)
-	{
-
-	}
-
-	//verify user login
-	public function verify_session($user)
-	{
-
-	}
-
-
-	//getter for session ID: returns current session ID
-	public function get_SID()
-	{
-
-	}
 }
 
 ?>

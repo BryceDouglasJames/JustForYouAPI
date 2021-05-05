@@ -13,6 +13,10 @@ class MessageController
         Message::useConnection($con);
     }
 
+
+    /*
+    *  CREATE POST TIMESTAMP, FORMAT PAYLOAD DATA AND INSERT POST INTO DB
+    */
     public function createNewPost($payload){
         $current = date_create();
         $formattedTime = date_format($current, 'Y-m-d H:i:s');
@@ -24,10 +28,13 @@ class MessageController
         $image = null;
         
         $valueArray = array($UID, $category, $title, $author, 0, $image, $body, $formattedTime, $formattedTime);
-        print_r($valueArray);
         return Message::createPost($UID, $valueArray);
     }
 
+    /*
+    *  CREATE UPDATE TIMESTAMP, AUTHENTICATE USER PRIVILAGE, 
+    *  EXECUTE UPDATE IF USER
+    */
     public function updateCurrentPost($payload){
         $current = date_create();
         $formattedTime = date_format($current, 'Y-m-d H:i:s');
@@ -45,20 +52,27 @@ class MessageController
         return Message::likePost($payload["post_id"]);
     }
 
+
+    /*
+    * CREATE DELETION TIMESTAMP, CHECK TO SEE IF ADMIN OR OP MADE REQUEST, 
+    * IF SO, DELETE POST FROM DB 
+    */
     public function deleteCurrentPost($payload){
         $current = date_create();
         $formattedTime = date_format($current, 'Y-m-d H:i:s');
         $UID = User::getID($payload["username"]);
         $post = Message::getPost($payload["post_id"]);
-
         if($post[0]["UID"] == $UID || $payload["username"] == "JUST4YOUMOD"){
             return Message::deletePost($post);
         }else{
             throw new error("User does not have permisson to delete this post.");
         }
-        
     }
 
+    /*
+    *   GRAB ALL POSTS WITHIN THE FIRST 100 RESULTS (FOR NOW)
+    *   RETURN OBJECT MAP OF POST TO BE HYDRATED 
+    */
     public function returnAllPosts(){
         $returnArray = array();
         $sql = 'SELECT * FROM userposts LIMIT 100';

@@ -19,6 +19,9 @@ class User extends Model
         parent::__construct();
     }
 
+    /*
+    *   SALTS USER PASSWORD AND HASHES STRING
+    */
     public function hashPassword($password){
         $salt1 = "JUST";
         $salt2 = "4YOU";
@@ -26,15 +29,17 @@ class User extends Model
         return $token;
     }
 
+    /*
+    *   GRABS SALT, GRABS USER, CHECK TO SEE IF PASSWORD MATCHES
+    */
     public function verifyPassword($password){
         $salt1 = "JUST";
         $salt2 = "4YOU";
-        //return password_verify($password, $_SESSION[hash("ripemd256", "$salt1$password$salt2")]);
         $answer = array();
         $sql = "SELECT * FROM  usertable  WHERE password = '" . hash("ripemd256", "$salt1$password$salt2") . "'";
         $result = self::query($sql);
         if(!$result){
-            throw new error("OH NO");
+            throw new error("Cannot verify password");
             return false;
         }else{
             while($row = $result->fetch_row()){
@@ -47,7 +52,9 @@ class User extends Model
         }
     }
     
-    //Grab by username and send back an array of selected user props
+    /*
+    *   QUERY USER FROM PAYLOAD AND RETURN USER PROPERTIES   
+    */    
     public static function getByUsername($username){
         $answer = array();
         $username = self::cleanSQL(self::$conn, $username);
@@ -70,7 +77,9 @@ class User extends Model
         }
     }
 
-    //return user by ID
+    /*
+    *   RETURN USER BY ID
+    */
     public static function getById($id){
         $id = self::cleanSQL(self::$conn, $id);
         $entries = self::getByField('id', $id);
@@ -78,7 +87,9 @@ class User extends Model
         return $entries[0];
     }
 
-    //Grab user ID and delte it accordingly
+    /*
+    *   DELETE USER BY ID
+    */    
     public static function deleteById($id){
         $id = self::cleanSQL(self::$conn, $id);
         $sql = 'DELETE FROM ' . self::getTable() . ' WHERE user_id= ' . $id;
@@ -87,7 +98,9 @@ class User extends Model
     }
 
 
-     //query all the users, return array of JSON objects
+    /*
+    *   QUERY ALL THE USERS, RETURN ARRAY OF OBJECT PROPERTIES   
+    */
      public function getAllUserData(){
         $returnTable = array();
         $result = self::query("SELECT * FROM " . self::getTable());
@@ -107,12 +120,20 @@ class User extends Model
         return $returnTable;
     }
     
+
+    /*
+    *  CREATES TIMESTAMP AND UPDATES USER LOGIN   
+    */
     public function recordLogin($UID){
         $current = date_create();
         $formatted = date_format($current, 'Y-m-d H:i:s');
         self::update(array("last_login"), array('"'.$formatted.'"'), $UID);            
     }
 
+
+    /*
+    *  CREATES TIMESTAMP AND UPDATES USER LOGOUT  
+    */
     public function recordLogout($UID){
         $current = date_create();
         $formatted = date_format($current, 'Y-m-d H:i:s');

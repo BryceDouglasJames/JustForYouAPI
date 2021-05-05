@@ -12,12 +12,10 @@ class MLAssistantController
         MLAssistant::useConnection($con);
     }
 
-
     public function updateScore($payload){
-        return MLAssistant::updateUserScore($payload);
-        
+        return MLAssistant::updateUserScore($payload);   
     }
-
+    
     public function getUserScore($payload){
         return MLAssistant::getUserProgressRecord($payload);
     }
