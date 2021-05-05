@@ -78,6 +78,33 @@ class User extends Model
     }
 
     /*
+    *   GRABS USER RECORD AND PULLS PROFILE DATA TO BE RETURNED TO CLIENT
+    */
+    public static function getUserProfileInfo($id){
+        $answer = array();
+        $username = self::cleanSQL(self::$conn, $id);
+        $username = base64_encode($username);
+        $sql = "SELECT * FROM userdata WHERE  PROVID = '" . $username . "'";
+        $result = self::query($sql);
+        if(!$result){
+            return false;
+        }else{
+            while($row = $result->fetch_row()){
+                $buffer = array(
+                    'DATA_ID' => $row[0],
+                    'DOB' => $row[2],
+                    'Weight' => $row[3],
+                    'Height' => $row[4],
+                    'Activity' => $row[5],
+                    'BMI' => $row[7]
+                ); 
+                array_push($answer, $buffer);    
+            }
+            return $answer;
+        }
+    }
+
+    /*
     *   RETURN USER BY ID
     */
     public static function getById($id){

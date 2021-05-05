@@ -115,12 +115,28 @@
     });
 
     
-    //upon request, authenticate new user and create recoirds for them in the DB
+    //upon request, authenticate new user and create records for them in the DB
     $router->post('/users/settings/basicinfo', function($request) use ($con){
         $data = $request->getPayloadData();
         $UserCall = new UserController($con);
         $UserCall -> setCurrentTable('userdata');
         return json_encode($UserCall -> createNewUserInfo($data));
+    });
+
+    //upon request, return simple profile data.
+    $router->post('/users/settings/get/basicinfo', function($request) use ($con){
+        $data = $request->getPayloadData();
+        $UserCall = new UserController($con);
+        $UserCall -> setCurrentTable('userdata');
+        return json_encode($UserCall -> getBasicUserInfo($data));
+    });
+
+    //upon request, update profile data.
+    $router->post('/users/settings/update/basicinfo', function($request) use ($con){
+        $data = $request->getPayloadData();
+        $UserCall = new UserController($con);
+        $UserCall -> setCurrentTable('userdata');
+        return json_encode($UserCall -> updateBasicUserInfo($data));
     });
 
     /*
