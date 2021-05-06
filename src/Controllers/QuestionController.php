@@ -78,6 +78,36 @@
 
 
         /*
+        *   Grabs all the questions a user answered and returns an array 
+        *   indexing the amount for each category
+        */
+        public function getQuestionsAnswered($payload){
+            $countArray = array(0,0,0,0);
+        
+            $answers = Question::getAllQuestionsAnswered($payload);
+            while($row = $answers->fetch_row()){
+                switch($row[3]){
+                    case 1:
+                        $countArray[0]++;
+                        break;
+                    case 2:
+                        $countArray[1]++;
+                        break;
+                    case 3:
+                        $countArray[2]++;
+                        break;
+                    case 4:
+                        $countArray[3]++;
+                        break;
+                    default:
+                        break;
+                }
+            }            
+            return $countArray;
+        }
+
+
+        /*
         *   Method ingests user question response payload, retieves user properties from
         *   DB, decodes question weights from row, and stores update into table and trigger ML 
         *   assistant update
@@ -112,5 +142,7 @@
 
             return Question::recordResponse($UID, $AID, $CAID, $AnswerIndex, $weight);
         }
+
+
 
     }

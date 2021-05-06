@@ -172,6 +172,14 @@
         return $question;
     });
 
+    //grab amount of answered questions by category.
+    $router -> post("/grab/question/answered/category", function($request) use ($con){
+        $data = $request->getPayloadData();
+        $controller = new QuestionController($con);
+        $question = $controller -> getQuestionsAnswered($data);
+        return json_encode($question);
+    });
+
     //grab random question/answers and return it to client
     $router -> post("/grab/question/answered", function($request) use ($con){
         $data = $request->getPayloadData();

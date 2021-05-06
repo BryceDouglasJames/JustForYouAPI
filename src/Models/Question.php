@@ -80,4 +80,21 @@
                 return $answer;
             }
         }
+
+
+        /*
+        *   GRAB ALL QUESTIONS USER ANSWERED AND RETURN QUERY OBJECT
+        */
+        public static function getAllQuestionsAnswered($payload){
+            $username = self::cleanSQL(self::$conn, $payload["username"]);
+            $user = User::getByUsername($username);
+
+            $sql = 'SELECT * FROM responses WHERE UID = '.$user[0]["UID"];
+            $answer = self::query($sql);
+            if(!$answer){
+                throw new Error("Cannot get answers from provided ID.");
+            }else{
+                return $answer;
+            }
+        }
     }
