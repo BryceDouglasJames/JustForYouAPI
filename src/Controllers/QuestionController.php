@@ -144,5 +144,37 @@
         }
 
 
+        public function getSuggestions($payload){
+            $dietSuggestions = array();
+            $fitSuggestions = array();
+            $mentalSuggestions = array();
+            $personalSuggestions = array();
+
+            $sql = "SELECT * FROM suggestions";
+            $response = Question::query($sql);
+            if(!$response){
+                throw new error("Cannot find suggestions");
+            }else{
+                while($row = $response->fetch_row()){
+                    switch($row[1]){
+                        case 1:
+                            array_push($mentalSuggestions, $row[2]);
+                            break;
+                        case 2:
+                            array_push($personalSuggestions, $row[2]);
+                            break;
+                        case 3:
+                            array_push($dietSuggestions, $row[2]);
+                            break;
+                        case 4:
+                            array_push($fitSuggestions, $row[2]);
+                            break;
+                    }
+                }
+
+                return array($mentalSuggestions, $personalSuggestions, $dietSuggestions, $fitSuggestions);
+            }
+        }
+
 
     }

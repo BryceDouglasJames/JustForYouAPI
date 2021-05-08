@@ -139,6 +139,13 @@
         return json_encode($UserCall -> updateBasicUserInfo($data));
     });
 
+    //upon request, update profile data.
+    $router->get('/users/suggestions', function($request) use ($con){
+        $data = $request->getPayloadData();
+        $suggestionCall = new QuestionController($con);
+        return json_encode($suggestionCall -> getSuggestions($data));
+    });
+
     /*
     *   TODO
     *   AFTER MIGRATION, THIS ENPOINT WILL HANLE USER PROFILE PIC STORAGE
